@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>비밀의 서점</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Serif+KR:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --w1:#2a1a10; --w2:#3d2818; --w3:#55381f; --lamp:#f2c078; --gold:#d9ab5f;
+  --ink:#f4e8d5; --dim:#c3aa8b; --faint:#8b7559;
+  --serif:"Noto Serif KR",serif; --display:"Gowun Batang","Noto Serif KR",serif;
+  --shadow:0 18px 40px rgba(0,0,0,.55);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100%;font-family:var(--serif);color:var(--ink);
+  background:radial-gradient(130% 85% at 50% -10%,#4a3020 0%,#20130b 55%,#120a06 100%);
+  overflow-x:hidden}
+button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px 70px}
+.screen{display:none}
+.screen.on{display:block;animation:fade .55s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;
+  background:linear-gradient(180deg,#e9c988,#c2913f);color:#2a1a0a;font-weight:700;letter-spacing:.02em;
+  box-shadow:0 8px 20px rgba(0,0,0,.4);transition:transform .18s,box-shadow .18s;font-size:14px}
+.btn:hover{transform:translateY(-2px)}
+.btn.ghost{background:none;border:1px solid rgba(217,171,95,.45);color:var(--dim);box-shadow:none;font-weight:400}
+.btn.ghost:hover{color:var(--ink);border-color:var(--gold)}
+.btn.danger{background:none;border:1px solid rgba(190,90,70,.55);color:#e0a294;box-shadow:none;font-weight:400}
+.btn.danger:hover{background:rgba(190,90,70,.16);color:#f3c4b8}
+
+/* ===== 정문 ===== */
+#gate.on{display:flex;align-items:center;justify-content:center;min-height:100svh;padding:34px 18px;animation:fade .7s ease both}
+.facade{text-align:center;max-width:540px;width:100%}
+.sign{font-family:var(--display);font-size:clamp(30px,7.5vw,50px);font-weight:700;letter-spacing:.18em;
+  color:var(--lamp);text-shadow:0 0 30px rgba(242,192,120,.4);margin:0 0 8px}
+.sign-sub{color:var(--faint);letter-spacing:.38em;font-size:11px;margin-bottom:30px}
+.door{width:min(270px,70vw);aspect-ratio:3/4.6;margin:0 auto;border-radius:140px 140px 8px 8px;
+  background:linear-gradient(170deg,var(--w3),var(--w1));border:3px solid #6b4526;
+  box-shadow:var(--shadow),inset 0 0 44px rgba(0,0,0,.65);position:relative;overflow:hidden;
+  transform-origin:left center;transition:transform 1s cubic-bezier(.6,0,.2,1),opacity 1s}
+.door::before{content:"";position:absolute;inset:15px;border-radius:120px 120px 5px 5px;border:1px solid rgba(217,171,95,.26)}
+.door-glass{position:absolute;top:32px;left:50%;transform:translateX(-50%);width:56%;aspect-ratio:1/1.35;
+  border-radius:100px 100px 4px 4px;background:linear-gradient(180deg,rgba(242,192,120,.32),rgba(242,192,120,.05));
+  box-shadow:inset 0 0 32px rgba(242,192,120,.4)}
+.knob{position:absolute;right:20px;top:58%;width:12px;height:12px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px rgba(217,171,95,.9)}
+.door.open{transform:perspective(900px) rotateY(-82deg);opacity:.12}
+.gate-note{margin-top:28px;color:var(--faint);font-size:13.5px;line-height:2}
+#flash{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;background:radial-gradient(60% 50% at 50% 50%,#f2c078,#3a2412 70%,#0c0704);transition:opacity .5s}
+#flash.on{opacity:1}
+
+/* ===== 헤더 ===== */
+.head{padding:30px 0 6px;text-align:center}
+.h-name{font-family:var(--display);font-size:clamp(23px,4.8vw,34px);font-weight:700;color:var(--lamp);letter-spacing:.12em;margin:0}
+.h-desc{color:var(--dim);font-size:13.5px;line-height:2.05;margin:14px auto 0;max-width:600px;font-weight:300}
+.h-desc em{color:var(--gold);font-style:normal}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:18px 0 4px;flex-wrap:wrap}
+.pg{flex:1;min-width:190px}
+.pg-track{height:5px;border-radius:99px;background:rgba(0,0,0,.5);overflow:hidden}
+.pg-fill{height:100%;width:0;background:linear-gradient(90deg,#c2913f,var(--lamp));transition:width .6s}
+.pg-label{font-size:11.5px;color:var(--faint);margin-top:7px;letter-spacing:.05em}
+
+/* ===== 책장 선택 ===== */
+.cases{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:16px;margin-top:22px}
+.case{text-align:left;padding:0;border-radius:9px;overflow:hidden;background:linear-gradient(180deg,var(--w2),var(--w1));
+  border:1px solid rgba(0,0,0,.5);box-shadow:var(--shadow);transition:transform .22s,border-color .22s}
+.case:hover{transform:translateY(-5px);border-color:rgba(217,171,95,.5)}
+.case-top{height:84px;position:relative;background:linear-gradient(180deg,#1b1009,#2c1b0f);display:flex;align-items:flex-end;gap:3px;padding:0 12px 9px;overflow:hidden}
+.case-top i{display:block;flex:1;border-radius:2px 2px 0 0;box-shadow:inset -2px 0 4px rgba(0,0,0,.45)}
+.case-plank{height:8px;background:linear-gradient(180deg,#6b4526,#38220f)}
+.case-body{padding:14px 15px 17px}
+.case-name{font-family:var(--display);font-size:16.5px;font-weight:700;margin:0 0 6px;color:var(--ink)}
+.case-desc{font-size:12.5px;color:var(--faint);line-height:1.75;font-weight:300;min-height:44px}
+.case-meta{margin-top:11px;font-size:11.5px;color:var(--gold);letter-spacing:.05em}
+.case.done .case-name{color:var(--faint)}
+
+/* ===== 책장 내부 ===== */
+.shelf-body{position:relative;background:linear-gradient(180deg,var(--w2),var(--w1) 72%);border:1px solid rgba(0,0,0,.5);
+  border-radius:6px;box-shadow:var(--shadow),inset 0 6px 22px rgba(0,0,0,.55);padding:20px 16px 0;margin-top:20px}
+.books{display:flex;align-items:flex-end;gap:4px;min-height:172px;overflow-x:auto;padding-bottom:2px}
+.books::-webkit-scrollbar{height:6px}
+.books::-webkit-scrollbar-thumb{background:rgba(217,171,95,.3);border-radius:99px}
+.plank{height:13px;margin:0 -16px;background:linear-gradient(180deg,#6b4526,#3a2312);border-radius:2px;box-shadow:0 8px 18px rgba(0,0,0,.6)}
+.spine{position:relative;min-width:26px;border-radius:3px 3px 1px 1px;overflow:hidden;
+  box-shadow:inset -4px 0 7px rgba(0,0,0,.45),inset 3px 0 4px rgba(255,255,255,.13),0 4px 10px rgba(0,0,0,.45);
+  transform-origin:bottom center;transition:transform .3s cubic-bezier(.34,1.3,.5,1),filter .3s}
+.spine:hover,.spine:focus-visible{transform:translateY(-20px) rotate(-2.5deg);filter:brightness(1.2);outline:none}
+.spine.round{border-radius:9px 9px 1px 1px}
+.spine.cloth::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 2px,transparent 2px 5px)}
+.sp-band{position:absolute;left:0;right:0;height:10%;background:rgba(0,0,0,.35);box-shadow:0 0 0 1px rgba(255,255,255,.16) inset}
+.sp-patch{position:absolute;left:16%;right:16%;top:26%;height:26%;border-radius:2px;background:rgba(0,0,0,.34);border:1px solid rgba(255,255,255,.3)}
+.sp-dots{position:absolute;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.4)}
+.sp-stripe{position:absolute;left:0;right:0;height:3px;background:rgba(255,255,255,.28)}
+.sp-ribbon{position:absolute;left:-30%;right:-30%;height:14%;background:rgba(255,255,255,.14);transform:rotate(-38deg)}
+.sp-gild{position:absolute;left:0;right:0;top:0;height:8%;background:linear-gradient(180deg,#e6c17d,#a97f35)}
+.warn{margin-top:14px;text-align:center;color:var(--faint);font-size:12px;letter-spacing:.04em;line-height:1.9}
+.empty{color:var(--faint);font-size:13px;padding:62px 0;text-align:center;width:100%;letter-spacing:.08em}
+
+/* ===== 모달 ===== */
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+  padding:calc(18px + env(safe-area-inset-top,0px)) 15px calc(18px + env(safe-area-inset-bottom,0px));
+  background:rgba(8,5,3,.86);backdrop-filter:blur(7px)}
+.modal.on{display:flex;animation:fade .3s ease both}
+.sheet{width:100%;max-width:720px;max-height:100%;overflow-y:auto;background:linear-gradient(175deg,#3b2716,#221408);
+  border:1px solid rgba(217,171,95,.3);border-radius:14px;box-shadow:0 30px 70px rgba(0,0,0,.75);padding:26px;
+  display:flex;gap:26px;flex-wrap:wrap;animation:rise .5s cubic-bezier(.2,.9,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(26px) scale(.96) rotateX(6deg)}to{opacity:1;transform:none}}
+.cover{width:184px;flex:0 0 auto;border-radius:3px 8px 8px 3px;overflow:hidden;position:relative;
+  box-shadow:0 18px 36px rgba(0,0,0,.65),inset -1px 0 0 rgba(255,255,255,.16)}
+.cover svg{display:block;width:100%;height:auto}
+.cover::after{content:"";position:absolute;left:0;top:0;bottom:0;width:10px;background:linear-gradient(90deg,rgba(0,0,0,.5),transparent);pointer-events:none}
+.detail{flex:1 1 270px;min-width:230px}
+.kick{font-size:11px;letter-spacing:.24em;color:var(--gold);margin-bottom:10px}
+.detail h2{font-family:var(--display);font-size:clamp(21px,4.4vw,27px);margin:0 0 7px;line-height:1.36}
+.by{color:var(--dim);font-size:13px;margin-bottom:8px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.tag{font-size:10.5px;letter-spacing:.08em;padding:4px 9px;border-radius:99px;border:1px solid rgba(217,171,95,.4);color:var(--gold)}
+.syn{font-size:14.5px;line-height:1.95;color:var(--dim);font-weight:300;margin:0 0 20px}
+.stamp{font-size:11.5px;color:var(--faint);margin-bottom:16px;letter-spacing:.04em}
+.acts{display:flex;gap:9px;flex-wrap:wrap}
+
+/* ===== 서재 ===== */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:18px;margin-top:22px}
+.lib{display:flex;flex-direction:column;gap:9px;text-align:left}
+.lib-c{width:100%;border-radius:2px 6px 6px 2px;overflow:hidden;box-shadow:0 10px 20px rgba(0,0,0,.55);transition:transform .22s}
+.lib-c svg{display:block;width:100%;height:auto}
+.lib:hover .lib-c{transform:translateY(-6px)}
+.lib-t{font-family:var(--display);font-size:12.5px;line-height:1.45;color:var(--ink)}
+.lib-m{font-size:10.5px;color:var(--faint);line-height:1.5}
+.lib-empty{text-align:center;color:var(--faint);padding:72px 16px;line-height:2.1;font-size:14px}
+.shelfline{height:11px;background:linear-gradient(180deg,#6b4526,#33200f);border-radius:2px;box-shadow:0 6px 14px rgba(0,0,0,.55);margin-top:26px}
+
+.ecover{aspect-ratio:2/3;container-type:inline-size;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ecover::before{content:"";position:absolute;inset:6%;border:1px solid rgba(255,255,255,.28);border-radius:3px}
+.ecover::after{content:"";position:absolute;left:50%;top:50%;width:84%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.24),transparent)}
+.ecover .em{position:relative;z-index:1;font-size:46cqw;line-height:1;filter:drop-shadow(0 8px 12px rgba(0,0,0,.35));font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.case-grp{font-size:10.5px;letter-spacing:.24em;color:var(--gold);margin-bottom:6px;opacity:.9}
+/* ===== 확인 대화 ===== */
+#ask{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(6,4,2,.88)}
+#ask.on{display:flex;animation:fade .25s ease both}
+.ask-box{max-width:400px;width:100%;background:linear-gradient(175deg,#3b2716,#221408);border:1px solid rgba(217,171,95,.3);
+  border-radius:12px;padding:26px;text-align:center;box-shadow:0 26px 60px rgba(0,0,0,.7)}
+.ask-box h3{font-family:var(--display);margin:0 0 12px;font-size:19px;color:var(--lamp)}
+.ask-box p{color:var(--dim);font-size:13.5px;line-height:1.95;font-weight:300;margin:0 0 22px}
+.ask-acts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.note{text-align:center;color:var(--faint);font-size:11.5px;margin-top:34px;line-height:2;opacity:.75}
+.mute{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:70;width:40px;height:40px;border-radius:50%;
+  background:rgba(40,25,14,.9);border:1px solid rgba(217,171,95,.35);font-size:16px;line-height:1}
+@media(max-width:560px){
+  .sheet{padding:20px;gap:18px}
+  .cover{width:138px;margin:0 auto}
+  .books{min-height:140px}
+}
+</style>
+</head>
+<body>
+
+<div id="flash"></div>
+
+<!-- 정문 -->
+<section id="gate" class="screen on">
+  <div class="facade">
+    <h1 class="sign">비밀의 서점</h1>
+    <div class="sign-sub">S E C R E T · L I B R A R I A</div>
+    <button class="door" id="doorBtn" aria-label="문 열기"><span class="door-glass"></span><span class="knob"></span></button>
+    <p class="gate-note">이 서점의 책들은 모두 제목을 지운 채 꽂혀 있습니다.<br>한 번 뽑은 책은 되돌려 꽂을 수 없습니다.</p>
+    <div style="margin-top:24px"><button class="btn" id="enterBtn">문을 열고 들어가기</button></div>
+  </div>
+</section>
+
+<!-- 로비: 책장 선택 -->
+<section id="lobby" class="screen">
+  <div class="wrap">
+    <div class="head">
+      <h1 class="h-name">비밀의 서점</h1>
+      <p class="h-desc">
+        간판도 주소도 없는 서점입니다. 문을 밀고 들어오면 먼지 냄새와 낡은 종이 냄새가 먼저 인사를 합니다.<br>
+        주인은 보이지 않고, 문학과 비문학을 나눈 열 개의 책장만이 각자의 <em>비밀</em>을 안은 채 벽을 따라 서 있습니다.<br>
+        모든 책은 제목을 지운 채 꽂혀 있어, 어떤 책을 만날지는 뽑기 전까지 아무도 모릅니다.<br>
+        <em>규칙은 하나뿐입니다 — 한 번 뽑은 책은 되돌려 꽂을 수 없습니다.</em>
+      </p>
+    </div>
+    <div class="bar">
+      <div class="pg"><div class="pg-track"><div class="pg-fill" id="pFill"></div></div><div class="pg-label" id="pLabel"></div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn ghost" id="toLib">📚 나의 서재</button>
+        <button class="btn danger" id="resetTop">기록 비우기</button>
+      </div>
+    </div>
+    <div class="cases" id="cases"></div>
+    <p class="note">책장을 골라 들어가세요. 어느 책장이든 언제든 드나들 수 있습니다.<br>서점의 모든 책을 읽고 나면, 기록을 비우고 처음부터 다시 시작할 수 있습니다.</p>
+  </div>
+</section>
+
+<!-- 책장 내부 -->
+<section id="shelf" class="screen">
+  <div class="wrap">
+    <div class="head">
+      <h1 class="h-name" id="shName"></h1>
+      <p class="h-desc" id="shDesc"></p>
+    </div>
+    <div class="bar">
+      <button class="btn ghost" id="backLobby">← 다른 책장 보기</button>
+      <div style="display:flex;gap:8px"><button class="btn ghost" id="toLib2">📚 나의 서재</button></div>
+    </div>
+    <div class="shelf-body"><div class="books" id="books"></div><div class="plank"></div></div>
+    <p class="warn">책등에는 아무것도 적혀 있지 않습니다.<br>손이 가는 책 하나를 뽑으면 — 그 책은 그대로 당신의 책이 됩니다.</p>
+  </div>
+</section>
+
+<!-- 나의 서재 -->
+<section id="library" class="screen">
+  <div class="wrap">
+    <div class="head">
+      <h1 class="h-name">나의 서재</h1>
+      <p class="h-desc" id="libLine"></p>
+    </div>
+    <div class="bar">
+      <button class="btn ghost" id="backLobby2">← 서점으로 돌아가기</button>
+      <button class="btn danger" id="resetLib">기록 비우기</button>
+    </div>
+    <div id="libBody"></div>
+  </div>
+</section>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="sheet" id="sheet"></div></div>
+
+<div id="ask"><div class="ask-box">
+  <h3 id="askT"></h3><p id="askP"></p>
+  <div class="ask-acts"><button class="btn" id="askYes"></button><button class="btn ghost" id="askNo">취소</button></div>
+</div></div>
+
+<button class="mute" id="muteBtn" title="소리 켜기/끄기">🔊</button>
+
+<script>
+/* =========================================================
+   책 데이터 — 10개 책장 (문학 6 · 비문학 4), 모두 한국어
+   [제목, 지은이, 나라, 장르, 이모티콘, 색상(hue), 줄거리]
+   ========================================================= */
+const RAW=[
+{grp:"문학",name:"한국문학의 책장",desc:"이 땅의 말로 쓰인 이야기들. 가장 가까운 곳의 상처와 온기가 꽂혀 있습니다.",books:[
+["소년이 온다","한강","한국","현대소설","🕯️",45,"1980년 5월 광주, 도청에 남았던 소년과 남겨진 사람들의 목소리를 차례로 따라갑니다. 읽는 내내 아프지만 끝내 눈을 돌리지 못하게 합니다."],
+["채식주의자","한강","한국","연작소설","🌿",130,"어느 날 고기를 먹지 않겠다고 선언한 여자와 그를 지켜보는 세 사람의 시선을 따라갑니다. 조용한 거부 하나가 가족을 흔듭니다."],
+["아몬드","손원평","한국","성장소설","🌰",30,"감정을 느끼는 부위가 작게 태어난 소년 윤재가 상처 입은 또 다른 소년을 만나며 조금씩 변해갑니다."],
+["토지","박경리","한국","대하소설","🌾",50,"구한말 하동 평사리에서 시작해 해방까지, 최참판댁과 사람들의 오랜 세월을 그린 한국 문학의 대하소설입니다."],
+["난장이가 쏘아올린 작은 공","조세희","한국","연작소설","🏙️",200,"재개발에 밀려나는 난장이 가족의 이야기로 1970년대 도시의 밑바닥을 시적인 문장으로 비춥니다."],
+["82년생 김지영","조남주","한국","현대소설","👩",290,"한 여성의 평범한 생애를 담담하게 따라가며 그 평범함 속에 쌓인 크고 작은 차별을 드러냅니다."]]},
+{grp:"문학",name:"세계문학 고전의 책장",desc:"백 년이 지나도 여전히 읽히는 이유가 있는 책들이 조용히 잠들어 있습니다.",books:[
+["데미안","헤르만 헤세","독일","성장소설","🐦",205,"평온한 세계에 살던 싱클레어가 데미안을 만나 자기 안의 어둠과 마주하며 알을 깨고 나옵니다."],
+["이방인","알베르 카뮈","프랑스","실존소설","☀️",25,"어머니의 장례식에서 울지 않았다는 이유로 심판대에 오른 남자, 뫼르소의 이야기입니다."],
+["어린 왕자","앙투안 드 생텍쥐페리","프랑스","동화","⭐",220,"사막에 불시착한 조종사가 작은 별에서 온 왕자를 만나며 길들임과 책임의 의미를 배웁니다."],
+["위대한 개츠비","F. 스콧 피츠제럴드","미국","현대고전","🥂",170,"매일 밤 화려한 파티를 여는 개츠비가 사실은 부두 건너편 초록 불빛 하나만 바라보고 있었다는 이야기입니다."],
+["죄와 벌","표도르 도스토옙스키","러시아","심리소설","🏚️",5,"가난한 대학생 라스콜니코프가 살인 뒤 스스로의 논리와 죄책감에 무너져 갑니다."],
+["노인과 바다","어니스트 헤밍웨이","미국","중편소설","🐟",195,"여든네 날 동안 고기를 잡지 못한 늙은 어부 산티아고가 거대한 청새치와 사흘을 겨룹니다."],
+["인간 실격","다자이 오사무","일본","고전소설","🎭",270,"사람이 두려워 광대 노릇으로 살아온 남자, 요조가 남긴 세 권의 수기입니다."],
+["변신","프란츠 카프카","체코","단편소설","🐛",60,"어느 아침 거대한 벌레로 변한 그레고르가 가족에게 점점 짐이 되어가는 이야기입니다."]]},
+{grp:"문학",name:"로맨스의 책장",desc:"밤이 깊을수록 손이 가는 책장. 가슴 뛰는 이야기와 오래 남는 사랑이 있습니다.",books:[
+["오만과 편견","제인 오스틴","영국","고전 로맨스","💌",335,"첫인상 때문에 서로를 오해한 엘리자베스와 다아시가 편견을 하나씩 벗어던지는 이야기입니다."],
+["제인 에어","샬럿 브론테","영국","고전 로맨스","🏰",260,"고아 소녀 제인이 손필드 저택의 로체스터를 만나 사랑과 자존심 사이에서 스스로 길을 택합니다."],
+["폭풍의 언덕","에밀리 브론테","영국","고전 로맨스","⛈️",230,"황량한 벌판에서 히스클리프와 캐서린의 사랑이 집착과 복수로 번져갑니다."],
+["로미오와 줄리엣","윌리엄 셰익스피어","영국","희곡","🌹",350,"원수 집안에서 태어난 두 젊은이가 사랑에 빠지고 그 사랑이 비극으로 끝나는 희곡입니다."],
+["냉정과 열정 사이","에쿠니 가오리·츠지 히토나리","일본","현대 로맨스","🖼️",15,"피렌체에서 그림을 복원하는 준세이와 밀라노의 아오이, 오래전 약속을 둘러싼 두 사람의 사랑을 각자의 목소리로 그립니다."],
+["노트북","니콜라스 스파크스","미국","현대 로맨스","🦢",190,"요양원의 한 노인이 아내에게 젊은 날 두 사람의 사랑을 노트에서 읽어줍니다."]]},
+{grp:"문학",name:"에세이의 책장",desc:"낮은 램프 아래 놓인 책장. 급할 때보다 지쳤을 때 손이 갑니다.",books:[
+["언어의 온도","이기주","한국","에세이","🌡️",20,"짧은 말 한마디가 사람을 데우기도 얼리기도 한다는 것을 일상의 장면으로 보여줍니다."],
+["나는 나로 살기로 했다","김수현","한국","에세이","🌤️",55,"남의 기준에 맞추느라 지친 사람에게 건네는 짧은 글들입니다. 가볍게 펼쳤다가 한 장에서 오래 멈추게 됩니다."],
+["여행의 이유","김영하","한국","여행 에세이","✈️",190,"소설가가 자신의 여행과 낯선 곳에서의 시간을 이야기합니다. 떠나는 이유는 늘 돌아온 뒤에야 알게 됩니다."],
+["무소유","법정","한국","수필","🍃",120,"필요하지 않은 것을 갖지 않는 삶에 대해 법정 스님이 담담하게 쓴 수필집입니다."],
+["곰돌이 푸, 서두르지 않아도 괜찮아","A. A. 밀른 원작","영국","에세이","🍯",40,"푸의 느긋한 말들에서 뽑은 문장으로 조급한 마음을 달래주는 책입니다."]]},
+{grp:"문학",name:"추리·스릴러의 책장",desc:"불을 끄면 가장 먼저 펼쳐지는 책장. 마지막 장을 덮기 전엔 잠들기 어렵습니다.",books:[
+["그리고 아무도 없었다","애거사 크리스티","영국","본격추리","🏝️",215,"외딴섬에 초대된 열 명이 동요의 가사대로 하나씩 사라집니다."],
+["바스커빌 가의 개","아서 코난 도일","영국","고전추리","🐕",35,"황야를 떠도는 거대한 사냥개의 전설과 한 가문의 저주를 홈즈가 파헤칩니다."],
+["용의자 X의 헌신","히가시노 게이고","일본","본격추리","📐",225,"수학 천재 교사가 이웃을 위해 완벽한 알리바이를 설계합니다."],
+["7년의 밤","정유정","한국","스릴러","🌑",200,"한순간의 사고가 두 가족을 7년에 걸쳐 파괴하는 한국 스릴러의 대표작입니다."],
+["양들의 침묵","토머스 해리스","미국","심리스릴러","🦋",280,"신참 수사관이 연쇄살인 사건의 단서를 얻으려 감옥의 정신과 의사와 대화를 시작합니다."],
+["다빈치 코드","댄 브라운","미국","미스터리","🗝️",40,"루브르 박물관장의 살해 사건에서 시작해 예술 작품에 숨은 암호를 쫓는 추적극입니다."]]},
+{grp:"문학",name:"SF·판타지의 책장",desc:"현실 바깥으로 난 문. 여기서부터는 이야기가 세계를 통째로 만들어냅니다.",books:[
+["해리 포터와 마법사의 돌","J.K. 롤링","영국","판타지","⚡",10,"벽장에서 살던 소년이 자신이 마법사임을 알게 되고 호그와트에 입학합니다."],
+["반지의 제왕","J.R.R. 톨킨","영국","하이판타지","💍",95,"작은 호빗이 세상을 파괴할 반지를 없애기 위해 길을 떠납니다."],
+["1984","조지 오웰","영국","디스토피아","👁️",300,"모든 것을 감시하는 체제 아래에서 한 남자가 일기를 쓰기 시작합니다."],
+["듄","프랭크 허버트","미국","스페이스오페라","🏜️",35,"사막 행성 아라키스를 둘러싼 권력 다툼과 한 소년의 운명을 그린 SF 대서사입니다."],
+["삼체","류츠신","중국","하드SF","🪐",165,"문화대혁명기에 발신된 한 신호가 인류와 외계 문명의 운명을 바꿔놓습니다."],
+["우리가 빛의 속도로 갈 수 없다면","김초엽","한국","SF 단편집","🚀",250,"먼 우주와 낯선 기술 속에서도 결국 사람의 마음을 이야기하는 단편집입니다."]]},
+{grp:"비문학",name:"역사·사회의 책장",desc:"지나온 시간과 지금의 세상을 읽는 책들. 사실이 이야기보다 낯설 때가 있습니다.",books:[
+["사피엔스","유발 하라리","이스라엘","인류사","🌍",40,"평범한 동물이던 인류가 어떻게 지구의 주인이 되었는지, 허구를 믿는 능력에서 답을 찾는 인류사입니다."],
+["총, 균, 쇠","재레드 다이아몬드","미국","문명사","🧭",25,"왜 어떤 대륙은 앞서고 어떤 대륙은 정복당했는지를 지리와 환경으로 설명합니다."],
+["팩트풀니스","한스 로슬링","스웨덴","사회과학","📊",200,"세상이 점점 나빠진다는 우리의 직감이 실제 데이터와 얼마나 다른지 보여줍니다."],
+["정의란 무엇인가","마이클 샌델","미국","정치철학","⚖️",345,"다양한 도덕적 딜레마를 통해 무엇이 옳은 일인지 묻는 정치철학 강의입니다."],
+["국가는 왜 실패하는가","대런 애쓰모글루·제임스 로빈슨","미국","정치경제","🏛️",270,"같은 조건에서도 어떤 나라는 번영하고 어떤 나라는 무너지는 이유를 제도에서 찾습니다."],
+["역사란 무엇인가","E.H. 카","영국","역사학","📜",55,"역사는 현재와 과거의 끊임없는 대화라는 말로 유명한, 역사를 보는 눈을 묻는 고전입니다."]]},
+{grp:"비문학",name:"과학의 책장",desc:"세계가 어떻게 생겼는지 묻는 책들. 다 읽고 나면 창밖 풍경이 달라 보입니다.",books:[
+["코스모스","칼 세이건","미국","천문학","🌌",235,"우주의 탄생부터 인류가 별을 올려다본 역사까지를 시처럼 풀어낸 교양과학의 고전입니다."],
+["이기적 유전자","리처드 도킨스","영국","진화생물학","🧬",150,"생명체를 유전자가 자신을 복제하기 위한 생존 기계로 보는 도발적인 진화생물학 책입니다."],
+["시간의 역사","스티븐 호킹","영국","물리학","⏳",260,"빅뱅과 블랙홀, 시간의 방향처럼 어려운 주제를 거의 수식 없이 설명합니다."],
+["떨림과 울림","김상욱","한국","물리학 에세이","🎶",185,"물리학자가 원자와 빛과 시간을 이야기하다 사람의 삶으로 돌아오는 에세이입니다."],
+["정재승의 과학 콘서트","정재승","한국","교양과학","🧠",330,"일상 속 궁금증을 뇌과학과 복잡계 과학으로 풀어낸 대표적인 한국 교양과학서입니다."],
+["물고기는 존재하지 않는다","룰루 밀러","미국","과학 논픽션","🐠",180,"한 분류학자의 삶을 따라가다 뜻밖의 진실에 도착하는 과학 논픽션입니다."]]},
+{grp:"비문학",name:"철학·심리의 책장",desc:"나를 이해하려는 사람이 가장 오래 머무는 책장입니다.",books:[
+["미움받을 용기","기시미 이치로·고가 후미타케","일본","심리학","🚪",45,"아들러 심리학을 철학자와 청년의 대화로 풀어냅니다."],
+["죽음의 수용소에서","빅터 프랭클","오스트리아","수기·심리학","🕊️",240,"수용소에서 살아남은 정신과 의사가 극한에서도 사람을 버티게 한 것은 삶의 의미라고 말합니다."],
+["명상록","마르쿠스 아우렐리우스","로마","고전철학","🏺",30,"로마 황제가 자기 자신에게 쓴 메모 모음으로, 흔들리지 않는 마음에 관한 스토아 철학의 고전입니다."],
+["생각에 관한 생각","대니얼 카너먼","미국","행동경제학","🤔",215,"빠른 직관과 느린 이성이 우리의 판단을 어떻게 속이는지 보여주는 명저입니다."],
+["차라투스트라는 이렇게 말했다","프리드리히 니체","독일","철학","⛰️",200,"산에서 내려온 예언자 차라투스트라의 입을 빌려 초인과 영원회귀를 이야기하는 니체의 대표작입니다."],
+["사랑의 기술","에리히 프롬","독일","심리학","❤️",350,"사랑을 운이 아니라 배우고 연습해야 하는 능력으로 바라봅니다."]]},
+{grp:"비문학",name:"경제·자기계발의 책장",desc:"내일을 조금 다르게 살고 싶은 사람의 책장입니다.",books:[
+["부자 아빠 가난한 아빠","로버트 기요사키","미국","재테크","💰",50,"두 아버지의 서로 다른 돈 이야기로 자산과 부채, 돈에 대한 사고방식을 이야기합니다."],
+["아주 작은 습관의 힘","제임스 클리어","미국","자기계발","🌱",140,"의지가 아니라 시스템을 바꾸라며, 1퍼센트의 작은 습관이 쌓이는 힘을 이야기합니다."],
+["인간관계론","데일 카네기","미국","자기계발","🤝",210,"사람을 대하는 기본 원칙을 다룬 자기계발서의 원조 격인 책입니다."],
+["돈의 속성","김승호","한국","경제·부","🪙",45,"돈을 대하는 태도와 부자의 습관을 이야기하는 책입니다."],
+["넛지","리처드 탈러·캐스 선스타인","미국","행동경제학","🎯",165,"사람들의 선택을 살짝 바꾸는 설계가 어떻게 더 나은 결정을 돕는지 보여줍니다."],
+["지적 대화를 위한 얕고 넓은 지식","채사장","한국","인문·교양","💬",280,"역사·경제·정치·사회·윤리를 한 흐름으로 훑어주는 입문서입니다."]]}
+];
+function hex(h,s,l){s/=100;l/=100;const a=s*Math.min(l,1-l),f=n=>{const k=(n+h/30)%12,c=l-a*Math.max(Math.min(k-3,9-k,1),-1);return Math.round(255*c).toString(16).padStart(2,"0")};return "#"+f(0)+f(8)+f(4)}
+const SHELVES=RAW.map(sh=>({...sh,books:sh.books.map(([t,a,n,g,e,h,syn])=>({t,a,n,g:[g],e,s:syn,c:[`hsl(${h},40%,42%)`,`hsl(${h},46%,14%)`],k:hex(h,65,84)}))}));
+function coverHTML(b){
+  return `<div class="ecover" style="background:linear-gradient(150deg,${b.c[0]},${b.c[1]})"><span class="em">${b.e}</span></div>`;
+}
+
+/* =========================================================
+   상태
+   ========================================================= */
+const LS="secret-bookstore-v3";
+let state={read:[]}, muted=false, currentShelf=0;
+const $=s=>document.querySelector(s);
+const key=b=>b.t+"§"+b.a;
+const isRead=b=>state.read.some(r=>r.k===key(b));
+const ALL=()=>SHELVES.flatMap(s=>s.books);
+function findBook(k){ for(const s of SHELVES) for(const b of s.books) if(key(b)===k) return b; return null; }
+
+function lsSave(){ try{ localStorage.setItem(LS,JSON.stringify(state)); }catch(e){} }
+function lsLoad(){ try{ const r=localStorage.getItem(LS); return r?JSON.parse(r):null; }catch(e){ return null; } }
+async function save(){ lsSave(); }
+async function initStorage(){
+  const l=lsLoad(); if(l&&Array.isArray(l.read)) state.read=l.read;
+  renderAll();
+}
+
+/* =========================================================
+   소리 — 서점의 조용한 소리 (합성)
+   ========================================================= */
+let AC=null, amb=null;
+function ctx(){ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==="suspended") AC.resume(); return AC; }
+/* 종이 넘기는 소리 — 아주 작고 부드럽게 */
+function pageSound(){
+  if(muted) return;
+  try{
+    const a=ctx(), dur=.6, sr=a.sampleRate, buf=a.createBuffer(1,sr*dur,sr), d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++){ const t=i/d.length; d[i]=(Math.random()*2-1)*Math.pow(Math.sin(Math.PI*t),1.6); }
+    const src=a.createBufferSource(); src.buffer=buf;
+    const bp=a.createBiquadFilter(); bp.type="bandpass"; bp.Q.value=.7;
+    bp.frequency.setValueAtTime(1100,a.currentTime);
+    bp.frequency.exponentialRampToValueAtTime(2200,a.currentTime+.25);
+    bp.frequency.exponentialRampToValueAtTime(900,a.currentTime+.55);
+    const lp=a.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2800;
+    const g=a.createGain(); g.gain.value=.05;
+    src.connect(bp); bp.connect(lp); lp.connect(g); g.connect(a.destination);
+    src.start();
+  }catch(e){}
+}
+/* 서점 문에 달린 작은 종소리 */
+function bell(){
+  if(muted) return;
+  try{
+    const a=ctx();
+    [1318.5,1975.5].forEach((f,i)=>{
+      const o=a.createOscillator(), g=a.createGain(), t=a.currentTime+i*.11;
+      o.type="sine"; o.frequency.value=f;
+      g.gain.setValueAtTime(.0001,t);
+      g.gain.exponentialRampToValueAtTime(.022,t+.03);
+      g.gain.exponentialRampToValueAtTime(.0001,t+1.8);
+      o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+1.9);
+    });
+  }catch(e){}
+}
+/* 서점 안의 낮은 공기 소리 (아주 작게) */
+function startAmb(){
+  if(muted||amb) return;
+  try{
+    const a=ctx(), len=a.sampleRate*6, buf=a.createBuffer(1,len,a.sampleRate), d=buf.getChannelData(0);
+    let last=0; for(let i=0;i<len;i++){ last=(last+.02*(Math.random()*2-1))/1.02; d[i]=last*3.2; }
+    const src=a.createBufferSource(); src.buffer=buf; src.loop=true;
+    const lp=a.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=380;
+    const g=a.createGain(); g.gain.setValueAtTime(0,a.currentTime); g.gain.linearRampToValueAtTime(.045,a.currentTime+3);
+    src.connect(lp); lp.connect(g); g.connect(a.destination); src.start();
+    amb={src,g};
+  }catch(e){}
+}
+function stopAmb(){
+  if(!amb) return;
+  try{ amb.g.gain.linearRampToValueAtTime(0,AC.currentTime+.5); }catch(e){}
+  const x=amb.src; amb=null; setTimeout(()=>{ try{x.stop()}catch(e){} },650);
+}
+
+/* =========================================================
+   렌더
+   ========================================================= */
+function show(id){
+  document.querySelectorAll(".screen").forEach(e=>e.classList.remove("on"));
+  $(id).classList.add("on");
+  window.scrollTo(0,0);
+}
+function updateReset(){ const done=ALL().every(isRead); ["#resetTop","#resetLib"].forEach(q=>$(q).style.display=done?"":"none"); }
+function renderAll(){ renderLobby(); renderShelf(); renderLib(); updateReset(); }
+
+function renderLobby(){
+  const total=ALL().length, read=ALL().filter(isRead).length;
+  $("#pFill").style.width=(read/total*100)+"%";
+  $("#pLabel").textContent=read===total?`모든 책을 읽었습니다 (${total}권). 이제 기록을 비우고 처음부터 다시 시작할 수 있습니다.`:`서점 전체 ${total}권 중 ${read}권을 읽었습니다 · 남은 책 ${total-read}권`;
+  const box=$("#cases"); box.innerHTML="";
+  SHELVES.forEach((sh,i)=>{
+    const remain=sh.books.filter(b=>!isRead(b)).length;
+    const el=document.createElement("button");
+    el.className="case"+(remain===0?" done":"");
+    const mini=sh.books.map((b,j)=>`<i style="height:${52+((b.t.length*7+j*19)%30)}%;background:linear-gradient(95deg,${b.c[1]},${b.c[0]} 45%,${b.c[1]});opacity:${isRead(b)?.22:1}"></i>`).join("");
+    el.innerHTML=`<div class="case-top">${mini}</div><div class="case-plank"></div>
+      <div class="case-body"><div class="case-grp">${sh.grp}</div><h3 class="case-name">${sh.name}</h3>
+      <p class="case-desc">${sh.desc}</p>
+      <div class="case-meta">${remain>0?`남은 책 ${remain}권 / ${sh.books.length}권`:"이 책장은 모두 비웠습니다"}</div></div>`;
+    el.onclick=()=>{ currentShelf=i; renderShelf(); show("#shelf"); };
+    box.appendChild(el);
+  });
+}
+
+function renderShelf(){
+  const sh=SHELVES[currentShelf];
+  $("#shName").textContent=sh.name;
+  $("#shDesc").textContent=sh.desc;
+  const row=$("#books"); row.innerHTML="";
+  const remain=sh.books.filter(b=>!isRead(b));
+  if(remain.length===0){ row.innerHTML=`<div class="empty">— 이 책장의 책은 모두 당신의 서재로 옮겨졌습니다 —</div>`; return; }
+  remain.forEach((b,i)=>{
+    const seed=b.t.length*7+b.a.length*13+i*29;
+    const h=104+(seed%66), gr=1+(seed%4), v=seed%6;
+    const btn=document.createElement("button");
+    btn.className="spine"+(v%3===0?" round":"")+(v%2===1?" cloth":"");
+    btn.style.height=h+"px"; btn.style.flex=`${gr} 1 0`;
+    btn.style.background=`linear-gradient(97deg,${b.c[1]},${b.c[0]} ${34+(seed%22)}%,${b.c[1]})`;
+    btn.setAttribute("aria-label","제목이 보이지 않는 책");
+    let deco="";
+    if(v===0) deco=`<span class="sp-band" style="top:11%"></span><span class="sp-band" style="bottom:11%"></span>`;
+    else if(v===1) deco=`<span class="sp-gild"></span><span class="sp-patch" style="background:${b.k}33;border-color:${b.k}"></span>`;
+    else if(v===2) deco=`<span class="sp-stripe" style="top:22%"></span><span class="sp-stripe" style="top:30%"></span><span class="sp-stripe" style="bottom:22%"></span>`;
+    else if(v===3) deco=`<span class="sp-dots" style="top:24%"></span><span class="sp-dots" style="top:40%"></span><span class="sp-dots" style="top:56%"></span>`;
+    else if(v===4) deco=`<span class="sp-ribbon" style="top:44%"></span><span class="sp-band" style="top:8%"></span>`;
+    else deco=`<span class="sp-patch" style="top:34%;height:32%;background:${b.k}22;border-color:${b.k}66"></span>`;
+    btn.innerHTML=deco;
+    btn.onclick=()=>pull(b);
+    row.appendChild(btn);
+  });
+}
+
+function renderLib(){
+  $("#libLine").textContent=`지금까지 ${state.read.length}권을 꺼내 꽂았습니다. 한 번 뽑은 책은 서점으로 돌아가지 않습니다.`;
+  const body=$("#libBody");
+  if(state.read.length===0){ body.innerHTML=`<div class="lib-empty">아직 서재가 비어 있습니다.<br>책장으로 돌아가 첫 책을 뽑아보세요.</div>`; return; }
+  const grid=document.createElement("div"); grid.className="grid";
+  [...state.read].reverse().forEach(r=>{
+    const b=findBook(r.k); if(!b) return;
+    const it=document.createElement("button"); it.className="lib";
+    it.innerHTML=`<div class="lib-c">${coverHTML(b)}</div><div class="lib-t">${b.t}</div><div class="lib-m">${b.a} · ${r.d}</div>`;
+    it.onclick=()=>{ pageSound(); openBook(b,true); };
+    grid.appendChild(it);
+  });
+  body.innerHTML=""; body.appendChild(grid);
+  const l=document.createElement("div"); l.className="shelfline"; body.appendChild(l);
+}
+
+/* =========================================================
+   책 뽑기 (되돌릴 수 없음)
+   ========================================================= */
+async function pull(b){
+  pageSound();
+  const d=new Date();
+  state.read.push({k:key(b),d:`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`});
+  await save();
+  openBook(b,false);
+  renderAll();
+}
+function openBook(b,again){
+  $("#sheet").innerHTML=`
+    <div class="cover">${coverHTML(b)}</div>
+    <div class="detail">
+      <div class="kick">${again?"이미 읽은 책":"당신이 뽑은 책"}</div>
+      <h2>${b.t}</h2>
+      <div class="by">${b.a} · ${b.n}</div>
+      <div class="tags">${b.g.map(g=>`<span class="tag">${g}</span>`).join("")}</div>
+      <p class="syn">${b.s}</p>
+      <div class="stamp">${again?"당신의 서재에 꽂혀 있습니다.":"이 책은 방금 당신의 서재로 옮겨졌습니다. 책장에는 더 이상 남아 있지 않습니다."}</div>
+      <div class="acts">
+        <button class="btn" id="cl1">${again?"닫기":"책장으로 돌아가기"}</button>
+        <button class="btn ghost" id="cl2">📚 나의 서재</button>
+      </div>
+    </div>`;
+  $("#modal").classList.add("on");
+  $("#cl1").onclick=closeModal;
+  $("#cl2").onclick=()=>{ closeModal(); renderLib(); show("#library"); };
+}
+function closeModal(){ $("#modal").classList.remove("on"); }
+$("#modal").addEventListener("click",e=>{ if(e.target===$("#modal")) closeModal(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeModal(); $("#ask").classList.remove("on"); }});
+
+/* =========================================================
+   확인창 / 리셋
+   ========================================================= */
+function ask(title,text,yes,fn){
+  $("#askT").textContent=title; $("#askP").textContent=text; $("#askYes").textContent=yes;
+  $("#ask").classList.add("on");
+  $("#askYes").onclick=()=>{ $("#ask").classList.remove("on"); fn(); };
+  $("#askNo").onclick=()=>$("#ask").classList.remove("on");
+}
+function doReset(){
+  ask("기록을 모두 비울까요?","읽은 책 기록이 전부 사라지고, 모든 책장이 처음 상태로 돌아갑니다. 이미 읽었던 책들도 다시 뽑을 수 있게 됩니다.","전부 비우기",async()=>{
+    state={read:[]};
+    try{ localStorage.removeItem(LS); }catch(e){}
+    await save();
+    currentShelf=0; renderAll(); closeModal(); show("#lobby");
+  });
+}
+$("#resetTop").onclick=doReset;
+$("#resetLib").onclick=doReset;
+
+/* =========================================================
+   화면 이동
+   ========================================================= */
+function enter(){
+  bell(); startAmb();
+  $("#doorBtn").classList.add("open");
+  setTimeout(()=>$("#flash").classList.add("on"),450);
+  setTimeout(()=>{
+    renderAll(); show("#lobby");
+    $("#doorBtn").classList.remove("open");
+    $("#flash").classList.remove("on");
+  },1000);
+}
+$("#doorBtn").onclick=enter;
+$("#enterBtn").onclick=enter;
+$("#toLib").onclick=()=>{ renderLib(); show("#library"); };
+$("#toLib2").onclick=()=>{ renderLib(); show("#library"); };
+$("#backLobby").onclick=()=>{ renderLobby(); show("#lobby"); };
+$("#backLobby2").onclick=()=>{ renderLobby(); show("#lobby"); };
+$("#muteBtn").onclick=()=>{ muted=!muted; $("#muteBtn").textContent=muted?"🔇":"🔊"; if(muted) stopAmb(); else { startAmb(); pageSound(); } };
+
+renderAll();
+initStorage();
+</script>
+</body>
+</html>
